@@ -1,4 +1,4 @@
-from ..configreader import DB
+from configreader import DB
 
 
 def make_connection_string(db: DB):
