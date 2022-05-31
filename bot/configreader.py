@@ -24,6 +24,7 @@ class Redis:
 @dataclass
 class Config:
     bot: Bot
+    db: DB
     redis: Redis
 
 
@@ -37,5 +38,11 @@ def load_config():
         redis=Redis(
             host=env.str("REDIS_HOST"),
             password=env.str("REDIS_PASSWORD")
+        ),
+        db=DB(
+            host=env.str("DB_HOST"),
+            db_name=env.str("DB_NAME"),
+            user=env.str("DB_USER"),
+            password=env.str("DB_PASS")
         )
     )
