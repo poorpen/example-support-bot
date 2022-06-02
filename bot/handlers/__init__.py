@@ -1,4 +1,4 @@
-from . import default_commands
+from . import commands
 from aiogram import Dispatcher
 
 

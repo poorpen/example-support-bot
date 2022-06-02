@@ -32,7 +32,7 @@ async def main():
 
     async with engine.begin() as conn:
         await conn.run_sync(metadata.create_all)
-    await setup_middleware(async_sessionmaker, dp)
+    await setup_middleware(sm=async_sessionmaker, dp=dp, redis=redis_connect)
     await registry_dialog(registry)
     await setup_routers(dp)
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
