@@ -11,7 +11,7 @@ router = Router()
 
 
 @router.message(commands=["start"])
-async def show_user_menu(message: types.Message, dialog_manager: DialogManager):
+async def start_command(message: types.Message, dialog_manager: DialogManager):
     repo: SQLAlchemyRepo = dialog_manager.data.get('repo')
     user_repo: UserRepo = repo.get_repo(UserRepo)
     operator_repo: OperatorRepo = repo.get_repo(OperatorRepo)

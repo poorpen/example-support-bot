@@ -1,6 +1,14 @@
-from sqlalchemy import Column, String, BigInteger, Integer, DateTime, ForeignKey, Text
+from sqlalchemy import Column, String, BigInteger, Integer, DateTime, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
 from bot.database.base import Base
+
+
+class FrequentlyQuestions(Base):
+    __tablename__ = "frequently_questions"
+    id = Column(Integer, primary_key=True)
+    question = Column(String)
+    photo_path = Column(String)
+    answer = Column(String)
 
 
 class Operator(Base):
@@ -23,5 +31,5 @@ class AnsweredAppeals(Base):
     __tablename__ = 'answered_appeals'
     id = Column(Integer, primary_key=True)
     operator_id = Column(BigInteger, ForeignKey('operator.telegram_id'))
-    user_name = Column(String, ForeignKey('telegram_user.first_name'))
+    user_name = Column(String)
     grade = Column(Integer)

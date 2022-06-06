@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery
 from typing import Any
-from aiogram_dialog import DialogManager
+from aiogram_dialog import DialogManager, StartMode
 
 from bot.repositories.repo import SQLAlchemyRepo
 from bot.database.models import TelegramUser, Operator
@@ -15,7 +15,7 @@ async def get_role(call: CallbackQuery, widget: Any, dialog_manager: DialogManag
     if role == 'oper':
         operator_repo: OperatorRepo = repo.get_repo(OperatorRepo)
         await operator_repo.add_operator(telegram_id=telegram_user.id)
-        state = UserState.main_menu
+        state = OperatorState.write_name
     else:
         user_repo: UserRepo = repo.get_repo(UserRepo)
         await user_repo.add_user(telegram_id=telegram_user.id,
@@ -23,5 +23,5 @@ async def get_role(call: CallbackQuery, widget: Any, dialog_manager: DialogManag
                                  first_name=telegram_user.first_name,
                                  last_name=telegram_user.last_name
                                  )
-        state = OperatorState.profile
-    await dialog_manager.start(state)
+        state = UserState.main_menu
+    await dialog_manager.start(state, mode=StartMode.NORMAL)
