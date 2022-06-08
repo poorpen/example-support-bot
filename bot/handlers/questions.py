@@ -7,7 +7,7 @@ from typing import Any
 
 from bot.repositories.repo import SQLAlchemyRepo
 from bot.repositories.questions_repo import FrequentlyQuestionsRepo
-from bot.all_states import OperatorState
+from bot.all_states import OperatorState, UserState
 
 
 # repo: SQLAlchemyRepo = dialog_manager.data.get('repo')
@@ -37,6 +37,15 @@ async def get_photo(message: Message, dialog: Dialog, dialog_manager: DialogMana
     #     new_file.write(downloaded_file)
     # # file_info =
     # file_info =
+
+
+async def answer(call: CallbackQuery, widget: Any, dialog_manager: DialogManager, id_: str):
+    repo: SQLAlchemyRepo = dialog_manager.data.get('repo')
+    frequently_questions_repo: FrequentlyQuestionsRepo = repo.get_repo(FrequentlyQuestionsRepo)
+    answer_data = await frequently_questions_repo.get_question_and_answer(id_=int(id_))
+    dialog_manager.current_context().dialog_data.update(answer=answer_data.answer)
+    dialog_manager.current_context().dialog_data.update(photo_path=answer_data.photo_path)
+    await dialog_manager.switch_to(UserState.andswer)
 
 
 async def add_question_and_answer(call: CallbackQuery, widget: Any, dialog_manager: DialogManager):

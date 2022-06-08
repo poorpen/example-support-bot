@@ -11,7 +11,7 @@ class AnsweredAppealsRepo(BaseSQLAlchemyRepo):
         average_rating = 0
         for appeal in operator.answered_appeals:
             average_rating += appeal.grade
-        average_rating / len(operator.answered_appeals)
+        average_rating = average_rating / len(operator.answered_appeals)
         operator.average_rating = average_rating
         await self._session.commit()
 

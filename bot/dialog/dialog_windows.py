@@ -3,19 +3,19 @@ import operator
 from aiogram.types import ContentType
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format, Jinja
-from aiogram_dialog.widgets.kbd import Button, Row, SwitchTo, Back, Select, Radio
+from aiogram_dialog.widgets.kbd import Button, Row, SwitchTo, Back, Select, Radio, Column
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.media import StaticMedia
 
 from bot.all_states import UserState, UserDialogState, RoleState, OperatorState, OperatorDialogState
 from bot.handlers.getters import get_operator_info, get_appeal_info, get_mark_data, get_frequently_questions, \
-    get_answer_and_question, get_connected_operator, get_user_name
+    get_answer_and_question, get_connected_operator, get_user_name, get_answer_data, get_answered_appeals
 from bot.handlers.appeal import get_appeal_and_send, dialog
 from bot.handlers.select_getter import get_role
 from bot.handlers.dialog_routers import return_to_main_menu, return_to_add_question, return_to_profile
 from bot.handlers.operator import get_operator_name, start_dialog, write_evaluate_operator, cancel_support
 from bot.handlers.when_handlers import evaluation_check, evaluation_not_check
-from bot.handlers.questions import get_question, get_answer,get_photo, add_question_and_answer
+from bot.handlers.questions import get_question, get_answer, get_photo, add_question_and_answer, answer
 
 role_reversal = Dialog(
     Window(
@@ -35,28 +35,44 @@ operator_menu = Dialog(
     Window(Format("Укажите ваше имя"),
            MessageInput(get_operator_name),
            state=OperatorState.write_name),
-    Window(Format("Добро пожаловать в профиль {name}\n"
-                  "Ваш рейтинг: {grade}/3 ⭐️"),
-           Row(SwitchTo(Const("История оценок"), id='see_grades', state=OperatorState.see_grades),
-               SwitchTo(Const("Изменить имя"), id='change_name', state=OperatorState.write_name), ),
-           SwitchTo(Const("Добавить Вопрос/Ответ"), id='add_que', state=OperatorState.add_question),
-           state=OperatorState.profile,
-           getter=get_operator_info),
+    Window(
+        Format("Добро пожаловать в профиль {name}\n"
+               "Ваш рейтинг: {grade}/3 ⭐️"),
+        Row(
+            SwitchTo(Const("История оценок"), id='see_grades', state=OperatorState.see_grades),
+            SwitchTo(Const("Изменить имя"), id='change_name', state=OperatorState.write_name), ),
+        SwitchTo(Const("Добавить Вопрос/Ответ"), id='add_que', state=OperatorState.add_question),
+        state=OperatorState.profile,
+        getter=get_operator_info),
+    Window(Jinja("Часто задаваемые вопросы:\n\n"
+                 "{% for answered_appeal in answered_appeals %}"
+                 "\nПользователь {{answered_appeal.user_name}}\nпоставил: {{answered_appeal.grade}} ⭐️\n\n"
+                 "{% endfor %}",
+                 when=lambda d, w, m: d['answered_appeals']),
+           Const("Никто ещё не оценил вашу работу",
+                 when=lambda d, w, m: not d['answered_appeals']),
+           Back(Const("Назад")),
+           state=OperatorState.see_grades,
+           getter=get_answered_appeals),
+
     # Window(Const("Выберите категорию для вопроса"))
     Window(Const("Напишите вопрос"),
            MessageInput(get_question),
-           Back(),
+           SwitchTo(Const("Назад"), id="return", state=OperatorState.profile),
            state=OperatorState.add_question),
     Window(Const("Напиши ответ на него"),
            MessageInput(get_answer),
-           Back(),
+           Back(Const("Назад")),
            state=OperatorState.add_answer, ),
     Window(Const("Отправьте фото"),
            MessageInput(get_photo, content_types=ContentType.PHOTO),
+           SwitchTo(Const("Пропустить шаг"), id="skip", state=OperatorState.show_qa),
+           Back(Const("Назад")),
            state=OperatorState.add_photo,
            ),
     Window(
-        StaticMedia(getter_key="photo_path", type=ContentType.PHOTO),
+        StaticMedia(getter_key="photo_path", type=ContentType.PHOTO,
+                    when=lambda data, w, m: data["photo_path"]),
         Format("Хотите ли вы добавить следующее:\n\n"
                "Вопрос:\n{question}\n\n"
                "Ответ:\n{answer}"),
@@ -76,14 +92,13 @@ operator_menu = Dialog(
 
 operator_dialog = Dialog(
     Window(Format("Поступило новое обращение!"
-                  "\n\n\n"
+                  "\n\n"
                   "Имя пользователя: {name}\n\n"
                   "Текст обращения:\n"
                   "────────────────────────\n"
                   "{text}"
                   "\n\n────────────────────────\n"),
-           SwitchTo(Const("Перейти в диалог ↘️"), state=OperatorDialogState.dialog, id='start_dialog',
-                    on_click=start_dialog),
+           Button(Const("Перейти в диалог ↘️"), id='start_dialog', on_click=start_dialog),
            state=OperatorDialogState.get_appeal,
            getter=get_appeal_info
            ),
@@ -111,21 +126,31 @@ user_menu = Dialog(
            MessageInput(get_appeal_and_send),
            state=UserState.write_appeal),
     Window(
-        Jinja("Часто задаваемые вопросы:\n\n"
-              "⠀⠀────────────────────⠀⠀\n"
-              "{% for question in questions %}"
-              "⠀⠀{{question.id}}. <b>Вопрос:</b> {{question.question}}\n"
-              "⠀⠀<b>Ответ:</b> {{question.answer}}"
-              "\n⠀⠀────────────────────⠀⠀\n"
-              "{% endfor %}"
-              "\n\nНе нашли ответ на свой вопрос? Напишите нам!", when=lambda d, w, m: d['questions']),
+        Const("Выберите интересующий вас вопрос"),
         Const("Вопросов нет",
               when=lambda d, w, m: not d['questions']),
-        SwitchTo(Const("Написать обращения"), id="write_appeal", state=UserState.write_appeal),
-        SwitchTo(Const("В главное меню"), id="return_manu", state=UserState.main_menu),
+        Column(
+            Select(
+                Format("{item[0]}"),
+                id='questions_',
+                item_id_getter=operator.itemgetter(1),
+                items="questions",
+                on_click=answer
+            )),
+        Row(
+            SwitchTo(Const("Написать обращения"), id="write_appeal", state=UserState.write_appeal),
+            SwitchTo(Const("В главное меню"), id="return_manu", state=UserState.main_menu)),
         state=UserState.questions,
         getter=get_frequently_questions
 
+    ),
+    Window(
+        StaticMedia(getter_key="photo_path", type=ContentType.PHOTO,
+                    when=lambda data, w, m: data["photo_path"]),
+        Format("{answer}"),
+        Back(Const("Назад"), id="back"),
+        state=UserState.andswer,
+        getter=get_answer_data
     )
 )
 

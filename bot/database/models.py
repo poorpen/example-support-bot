@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, Integer, DateTime, ForeignKey, Text, JSON
+from sqlalchemy import Column, String, BigInteger, Integer, DateTime, ForeignKey, Text, JSON, Float
 from sqlalchemy.orm import relationship
 from bot.database.base import Base
 
@@ -15,8 +15,8 @@ class Operator(Base):
     __tablename__ = "operator"
     telegram_id = Column(BigInteger, nullable=False, default=None, primary_key=True)
     name = Column(String(length=20))
-    average_rating = Column(Integer, default=0)
-    answered_appeals = relationship("AnsweredAppeals", lazy="joined", cascade="all, delete-orphan")
+    average_rating = Column(Float, default=0)
+    answered_appeals = relationship("AnsweredAppeals", lazy="joined", cascade="all, delete")
 
 
 class TelegramUser(Base):
@@ -30,6 +30,6 @@ class TelegramUser(Base):
 class AnsweredAppeals(Base):
     __tablename__ = 'answered_appeals'
     id = Column(Integer, primary_key=True)
-    operator_id = Column(BigInteger, ForeignKey('operator.telegram_id'))
+    operator_id = Column(BigInteger, ForeignKey('operator.telegram_id', ondelete="CASCADE"))
     user_name = Column(String)
     grade = Column(Integer)

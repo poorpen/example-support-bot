@@ -1,0 +1,35 @@
+  GNU nano 4.8                               docker-compose.yml
+version: "3.3"
+
+services:
+  redis:
+    image:
+      bitnami/redis:6.2.6
+    volumes:
+      - "/src/support/redis/data:/data"
+    environment:
+      - REDIS_PASSWORD=password
+  db:
+    container_name: database_
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=name
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=database
+    ports:
+      - 5435:5435
+    volumes:
+      - /src/support/database-data:/var/lib/postgresql/data/
+
+  support_bot:
+    container_name: support
+    build:
+      context: .
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+
+

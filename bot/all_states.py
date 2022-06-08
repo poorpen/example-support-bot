@@ -32,4 +32,5 @@ class OperatorDialogState(StatesGroup):
 class UserState(StatesGroup):
     main_menu = State()
     questions = State()
+    andswer = State()
     write_appeal = State()

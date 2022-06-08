@@ -48,6 +48,7 @@ async def start_dialog(call: CallbackQuery, widget: Any, dialog_manager: DialogM
                                    data={'companion_id': companion_id, "user_name": name})
     else:
         await call.answer(text="Пользователь общается с другим оператором", show_alert=True)
+        return
 
 
 async def cancel_support(call: CallbackQuery, widget: Any, dialog_manager: DialogManager):

@@ -4,12 +4,12 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.dispatcher.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from configreader import Config, load_config
 from aioredis import Redis
-from database.database_utility import make_connection_string
 from sqlalchemy.orm import sessionmaker
 from aiogram_dialog import DialogRegistry
 
+from bot.database.database_utility import make_connection_string
+from bot.configreader import Config, load_config
 from bot.handlers import commands, register_handlers, setup_routers
 from bot.dialog import registry_dialog
 from bot.middlewares import setup_middleware
