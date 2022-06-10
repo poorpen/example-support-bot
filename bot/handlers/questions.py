@@ -27,8 +27,7 @@ async def get_photo(message: Message, dialog: Dialog, dialog_manager: DialogMana
     bot: Bot = dialog_manager.data.get('bot')
     photo_size: PhotoSize = message.photo[-1]
     file_info = await bot.get_file(file_id=photo_size.file_id)
-    bot_path = os.path.abspath(".")
-    full_path = f"{bot_path}/{file_info.file_path}"
+    full_path = f"/src/bot/{file_info.file_path}"
     await bot.download_file(file_info.file_path, full_path)
     dialog_manager.current_context().dialog_data.update(photo_path=full_path)
     await dialog_manager.switch_to(OperatorState.show_qa)

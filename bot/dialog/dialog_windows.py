@@ -19,7 +19,7 @@ from bot.handlers.questions import get_question, get_answer, get_photo, add_ques
 
 role_reversal = Dialog(
     Window(
-        Const('За кого бы вы хотели протестировать бота'),
+        Const('За кого бы вы хотели протестировать бота?'),
         Select(
             Format("{item[0]}"),
             id='switch_role',
@@ -44,7 +44,7 @@ operator_menu = Dialog(
         SwitchTo(Const("Добавить Вопрос/Ответ"), id='add_que', state=OperatorState.add_question),
         state=OperatorState.profile,
         getter=get_operator_info),
-    Window(Jinja("Часто задаваемые вопросы:\n\n"
+    Window(Jinja("История оценок:\n\n"
                  "{% for answered_appeal in answered_appeals %}"
                  "\nПользователь {{answered_appeal.user_name}}\nпоставил: {{answered_appeal.grade}} ⭐️\n\n"
                  "{% endfor %}",
@@ -122,7 +122,7 @@ user_menu = Dialog(
            SwitchTo(Const("Часто задаваемые вопросы"), id="questions", state=UserState.questions),
            state=UserState.main_menu),
     Window(Const('Напишите ваше обращения'),
-           Back(),
+           Back(Const("Назад")),
            MessageInput(get_appeal_and_send),
            state=UserState.write_appeal),
     Window(

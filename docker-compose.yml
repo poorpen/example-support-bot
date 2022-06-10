@@ -14,12 +14,12 @@ services:
     environment:
       - POSTGRES_USER=name
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=database
+      - POSTGRES_DB=db_name
     ports:
       - 5435:5435
     volumes:
       - /src/support/database-data:/var/lib/postgresql/data/
-
+    
   support_bot:
     container_name: support
     build:
@@ -30,5 +30,4 @@ services:
     depends_on:
       - db
       - redis
-
 
