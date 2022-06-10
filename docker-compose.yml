@@ -5,7 +5,7 @@ services:
     image:
       bitnami/redis:6.2.6
     volumes:
-      - "/src/support/redis/data:/data"
+      - "/home/roman/support/redis/data:/data"
     environment:
       - REDIS_PASSWORD=password
   db:
@@ -16,9 +16,9 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=db_name
     ports:
-      - 5435:5435
+      - "5435:5435"
     volumes:
-      - /src/support/database-data:/var/lib/postgresql/data/
+      - /home/roman/support/database-data:/var/lib/postgresql/data/
     
   support_bot:
     container_name: support
@@ -27,6 +27,8 @@ services:
     restart: always
     env_file:
       - .env
+    volumes:
+      - /src/support/photos:/src/bot/photos
     depends_on:
       - db
       - redis
