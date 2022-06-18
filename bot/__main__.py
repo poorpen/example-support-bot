@@ -10,7 +10,7 @@ from aiogram_dialog import DialogRegistry
 
 from bot.database.database_utility import make_connection_string
 from bot.configreader import Config, load_config
-from bot.handlers import commands, register_handlers, setup_routers
+from bot.handlers import commands, register_handlers
 from bot.dialog import registry_dialog
 from bot.middlewares import setup_middleware
 from bot.database.base import metadata
@@ -35,7 +35,6 @@ async def main():
     async with engine.begin() as conn:
         await conn.run_sync(metadata.create_all)
     registry = DialogRegistry(dp)
-    await setup_routers(dp)
     await register_handlers(dp)
     await setup_middleware(sm=async_sessionmaker, dp=dp, redis=redis_connect)
     await registry_dialog(registry)

@@ -94,9 +94,3 @@ async def get_connected_operator(dialog_manager: DialogManager, **kwargs):
         "operatoname": name
     }
 
-
-async def get_user_name(dialog_manager: DialogManager, **kwargs):
-    name = dialog_manager.current_context().start_data.get("user_name")
-    return {
-        "user_name": name
-    }

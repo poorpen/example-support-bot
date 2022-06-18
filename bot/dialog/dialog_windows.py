@@ -9,7 +9,7 @@ from aiogram_dialog.widgets.media import StaticMedia
 
 from bot.all_states import UserState, UserDialogState, RoleState, OperatorState, OperatorDialogState
 from bot.handlers.getters import get_operator_info, get_appeal_info, get_mark_data, get_frequently_questions, \
-    get_answer_and_question, get_connected_operator, get_user_name, get_answer_data, get_answered_appeals
+    get_answer_and_question, get_connected_operator, get_answer_data, get_answered_appeals
 from bot.handlers.appeal import get_appeal_and_send, dialog
 from bot.handlers.select_getter import get_role
 from bot.handlers.dialog_routers import return_to_main_menu, return_to_add_question, return_to_profile
@@ -91,23 +91,11 @@ operator_menu = Dialog(
 )
 
 operator_dialog = Dialog(
-    Window(Format("Поступило новое обращение!"
-                  "\n\n"
-                  "Имя пользователя: {name}\n\n"
-                  "Текст обращения:\n"
-                  "────────────────────────\n"
-                  "{text}"
-                  "\n\n────────────────────────\n"),
-           Button(Const("Перейти в диалог ↘️"), id='start_dialog', on_click=start_dialog),
-           state=OperatorDialogState.get_appeal,
-           getter=get_appeal_info
-           ),
     Window(
-        Format("Вы на связи с пользователем {user_name}"),
+        Format("Вы на связи с пользователем"),
         MessageInput(dialog),
         Button(Const("Завершить сеанс"), id="cancle_support", on_click=cancel_support),
         state=OperatorDialogState.dialog,
-        getter=get_user_name
 
     ),
     Window(Format("Вы завершили чат"),

@@ -1,7 +1,6 @@
 from aiogram import Router, types
 from aiogram_dialog import DialogManager, StartMode
 
-from bot.all_states import UserState
 from bot.repositories.repo import SQLAlchemyRepo
 from bot.repositories.operator_repo import OperatorRepo
 from bot.repositories.user_repo import UserRepo
@@ -10,7 +9,6 @@ from bot.all_states import OperatorState, UserState, RoleState
 router = Router()
 
 
-@router.message(commands=["start"])
 async def start_command(message: types.Message, dialog_manager: DialogManager):
     repo: SQLAlchemyRepo = dialog_manager.data.get('repo')
     user_repo: UserRepo = repo.get_repo(UserRepo)
